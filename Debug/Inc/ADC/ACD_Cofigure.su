@@ -1,0 +1,2 @@
+../Inc/ADC/ACD_Cofigure.c:10:6:ADC1_Configure	24	static
+../Inc/ADC/ACD_Cofigure.c:27:6:Read_ADC1	24	static

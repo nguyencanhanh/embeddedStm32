@@ -1,0 +1,4 @@
+../Drivers/CMSIS/core_cm3.h:1511:22:__NVIC_EnableIRQ	16	static
+../Inc/DMA/DMA_Configure.c:4:6:DMA_ConfigureADC	16	static
+../Inc/DMA/DMA_Configure.c:14:6:DMA_ConfigureUART	8	static
+../Inc/DMA/DMA_Configure.c:29:6:sendUART1DMA	16	static
