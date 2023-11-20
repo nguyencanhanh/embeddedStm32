@@ -2,11 +2,14 @@
 #ifndef RTOS_RTOS_H_
 #define RTOS_RTOS_H_
 
+#include <stdio.h>
 #include <stm32f1xx.h>
 
 #define LED12_ON				  GPIOB->BSRR |= (1 << 12)
 #define LED12_OFF 	  			  GPIOB->BSRR |= (1 << 28)
 #define LED12_TOGGLE 			  GPIOB->ODR  ^= (1 << 12)
+
+#define BUZZER                    GPIOB->ODR  ^= (1 << 11)
 
 #define DUMMY_XPSR                0x01000000
 
@@ -20,21 +23,14 @@
 #define SIZE_SRAM                 (20 * 1024)
 #define SRAM_END                  (SRAM_START + SIZE_SRAM)
 
-#define T1_STACK_START            SRAM_END
-#define T2_STACK_START            (SRAM_END - (1 * SIZE_TASK_STACK))
-#define T3_STACK_START            (SRAM_END - (2 * SIZE_TASK_STACK))
-#define T4_STACK_START            (SRAM_END - (3 * SIZE_TASK_STACK))
-#define T5_STACK_START            (SRAM_END - (4 * SIZE_TASK_STACK))
-#define T6_STACK_START            (SRAM_END - (5 * SIZE_TASK_STACK))
-#define T7_STACK_START            (SRAM_END - (6 * SIZE_TASK_STACK))
 #define IDLE_STACK_START          (SRAM_END - (7 * SIZE_TASK_STACK))
 #define SCHED_STACK_START         (SRAM_END - (8 * SIZE_TASK_STACK))
 
 #define TICK_HZ                   1000U
 #define HSI_CLOCK                 8000000U
-#define SYSTICK_TIM_CLK           HSI_CLOCK
+#define SYSTICK_TIM_CLK           9 * HSI_CLOCK
 
-#define MAX_TASK                  8
+#define MAX_TASK                  5
 
 #define DISABLE_IRQ()             do{__asm volatile("MOV R0, #0x1"); __asm volatile("MSR PRIMASK,R0");} while(0)
 #define ENABLE_IRQ()              do{__asm volatile("MOV R0, #0x0"); __asm volatile("MSR PRIMASK,R0");} while(0)
@@ -46,13 +42,19 @@ typedef struct{
 	void(*task_handler)(void);
 }TCB_t;
 
+extern uint8_t curent_task;
+extern uint32_t g_tick_count;
+extern TCB_t user_task[MAX_TASK];
+
+void createTask(void (*myTask)(void));
+
 void idle_task(void);
 
 void init_systick_timer(uint32_t tick_hz);
 
 __attribute__((naked)) void init_scheduler_stack(uint32_t sched_top_of_stack);
 
-void init_task_stack(void (*MainFunction)());
+void init_task_stack(void (*idleTask)(void));
 
 __attribute__((naked)) void swich_sp_to_psp(void);
 
