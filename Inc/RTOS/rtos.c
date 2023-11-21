@@ -5,7 +5,6 @@ uint8_t curent_task = 1;
 uint32_t g_tick_count = 0;
 TCB_t user_task[MAX_TASK];
 
-
 void createTask(void (*myTask)(void)){
   user_task[numberTask+1].task_handler = myTask;
   numberTask++;
@@ -25,11 +24,10 @@ void init_task_stack(void (*idleTask)(void)){
 	user_task[0].psp_value    = IDLE_STACK_START;
 	user_task[0].task_handler = idleTask;
 	uint32_t *pPSP;
-	for(int i = 0; i < sizeof(user_task) / sizeof(user_task[0]); i++){
+	for(int i = 0; i < numberTask + 1; i++){
 		user_task[i].curent_state = TASK_RUNNING_STATE;
-    if(i + 1 < sizeof(user_task) / sizeof(user_task[0])){
-      user_task[i+1].psp_value = (SRAM_END - (i * SIZE_TASK_STACK));
-    }
+		if(i + 1 < numberTask + 1)
+			user_task[i+1].psp_value = (SRAM_END - (i * SIZE_TASK_STACK));
 		pPSP = (uint32_t*) user_task[i].psp_value;
 		pPSP--;
 		*pPSP = DUMMY_XPSR;
@@ -40,7 +38,6 @@ void init_task_stack(void (*idleTask)(void)){
 		for (int j = 0; j < 13; j++){
 			pPSP--;
 			*pPSP = 0;
-
 		}
 		user_task[i].psp_value = (uint32_t)pPSP;
 	}
@@ -60,17 +57,15 @@ void save_psp_value(uint32_t curent_psp_value){
 
 void update_next_task(void){
 	int state = TASK_BLOCK_STATE;
-	for (int i =0; i < sizeof(user_task) / sizeof(user_task[0]); i++){
+	for (int i =0; i < numberTask + 1; i++){
 		curent_task ++;
-		curent_task %= sizeof(user_task) / sizeof(user_task[0]);
+		curent_task %= (numberTask + 1);
 		state = user_task[curent_task].curent_state;
-		if((state == TASK_RUNNING_STATE) && (curent_task != 0)){
+		if((state == TASK_RUNNING_STATE) && (curent_task != 0))
 			break;
-		}
 	}
-	if (state != TASK_RUNNING_STATE){
+	if (state != TASK_RUNNING_STATE)
 		curent_task = 0;
-	}
 }
 
 __attribute__((naked)) void swich_sp_to_psp(void){
@@ -99,13 +94,30 @@ void task_delay(uint32_t tick_count){
 }
 
 void unblock_task(void){
-	for (int i = 1; i < sizeof(user_task) / sizeof(user_task[0]); i++){
+	for (int i = 1; i < numberTask + 1; i++){
 		if (user_task[i].curent_state != TASK_RUNNING_STATE){
 			if(user_task[i].block_count == g_tick_count){
 				user_task[i].curent_state = TASK_RUNNING_STATE;
 			}
 		}
 	}
+}
+
+void rtosInit(void (*idleTask)(void)){
+	enable_rpocessor_faults();
+	init_scheduler_stack(SCHED_STACK_START);
+	init_task_stack(idleTask);
+	init_systick_timer(TICK_HZ);
+	swich_sp_to_psp();
+}
+
+
+void suspenTask(void){
+	user_task[curent_task].curent_state = TASK_BLOCK_STATE;
+}
+
+void resumeTask(void){
+	user_task[curent_task].curent_state = TASK_RUNNING_STATE;
 }
 
 void HardFault_Handler(void){

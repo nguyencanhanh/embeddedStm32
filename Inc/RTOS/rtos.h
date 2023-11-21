@@ -5,11 +5,14 @@
 #include <stdio.h>
 #include <stm32f1xx.h>
 
-#define LED12_ON				  GPIOB->BSRR |= (1 << 12)
-#define LED12_OFF 	  			  GPIOB->BSRR |= (1 << 28)
-#define LED12_TOGGLE 			  GPIOB->ODR  ^= (1 << 12)
-
-#define BUZZER                    GPIOB->ODR  ^= (1 << 11)
+#define RTOS_INIT(idleTask)  \
+    do { \
+        enable_rpocessor_faults();\
+		init_scheduler_stack(SCHED_STACK_START);\
+		init_task_stack(idleTask);\
+		init_systick_timer(TICK_HZ);\
+		swich_sp_to_psp(); \
+    } while(0)
 
 #define DUMMY_XPSR                0x01000000
 
@@ -30,7 +33,7 @@
 #define HSI_CLOCK                 8000000U
 #define SYSTICK_TIM_CLK           9 * HSI_CLOCK
 
-#define MAX_TASK                  5
+#define MAX_TASK                  8
 
 #define DISABLE_IRQ()             do{__asm volatile("MOV R0, #0x1"); __asm volatile("MSR PRIMASK,R0");} while(0)
 #define ENABLE_IRQ()              do{__asm volatile("MOV R0, #0x0"); __asm volatile("MSR PRIMASK,R0");} while(0)
@@ -45,6 +48,8 @@ typedef struct{
 extern uint8_t curent_task;
 extern uint32_t g_tick_count;
 extern TCB_t user_task[MAX_TASK];
+
+void rtosInit(void (*idleTask)(void));
 
 void createTask(void (*myTask)(void));
 
@@ -67,6 +72,10 @@ uint32_t get_psp_value(void);
 void update_next_task(void);
 
 void unblock_task(void);
+
+void suspenTask(void);
+
+void resumeTask(void);
 
 void task_delay(uint32_t tick_count);
 

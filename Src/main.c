@@ -18,7 +18,7 @@ void task1_handler(void);
 void task2_handler(void);
 void task3_handler(void);
 void task4_handler(void);
-void taskDefault(void);
+void idleTask(void);
 
 
 uint8_t GPIOB_Pin[] = {11,12};
@@ -37,18 +37,14 @@ int main(void)
 
 	GPIO_configureRCC("B");
 	GPIO_configure((GPIO_TypeDef*)GPIOB, (uint8_t*)GPIOB_Pin ,(uint8_t*)GPIOB_mode);
-	enable_rpocessor_faults();
-	init_scheduler_stack(SCHED_STACK_START);
-	init_task_stack(taskDefault);
-	init_systick_timer(TICK_HZ);
-	swich_sp_to_psp();
+
+	RTOS_INIT(idleTask);
 
 	while (1){
-
 	}
 }
 
-void taskDefault(void){
+void idleTask(void){
 	while(1);
 }
 
@@ -59,20 +55,19 @@ void task1_handler(void){
 }
 void task2_handler(void){
 	while(1){
-		LED12_TOGGLE;
-		task_delay(1000);
 		printf("oke");
 	}
 }
 void task3_handler(void){
 	while(1){
-		GPIOB->ODR ^= (1 << 11);
 		task_delay(1000);
 		printf("oke");
 	}
 }
 void task4_handler(void){
 	while(1){
+		GPIOB_TOGGLE(12);
+		task_delay(1000);
 		printf("oke");
 	}
 }
