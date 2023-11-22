@@ -2,11 +2,12 @@
 
 uint8_t numberTask = 0;
 uint8_t curent_task = 1;
-uint32_t g_tick_count = 0;
 TCB_t user_task[MAX_TASK];
+GTIME gTime[MAX_TASK];
 
 void createTask(void (*myTask)(void)){
   user_task[numberTask+1].task_handler = myTask;
+  gTime[numberTask+1].g_tick_count=0;
   numberTask++;
 }
 
@@ -83,8 +84,8 @@ __attribute__((naked)) void swich_sp_to_psp(void){
 
 void task_delay(uint32_t tick_count){
 	DISABLE_IRQ();
-	extern uint32_t g_tick_count;
-	g_tick_count = 0;
+	gTime[curent_task].g_tick_count = 0;
+	gTime[curent_task].stateDelay = IN_DELAY;
 	if(curent_task){
 		user_task[curent_task].block_count = tick_count;
 		user_task[curent_task].curent_state = TASK_BLOCK_STATE;
@@ -96,8 +97,9 @@ void task_delay(uint32_t tick_count){
 void unblock_task(void){
 	for (int i = 1; i < numberTask + 1; i++){
 		if (user_task[i].curent_state != TASK_RUNNING_STATE){
-			if(user_task[i].block_count == g_tick_count){
+			if(user_task[i].block_count <= gTime[i].g_tick_count){
 				user_task[i].curent_state = TASK_RUNNING_STATE;
+				gTime[i].stateDelay = OUT_DELAY;
 			}
 		}
 	}
@@ -112,12 +114,22 @@ void rtosInit(void (*idleTask)(void)){
 }
 
 
-void suspenTask(void){
-	user_task[curent_task].curent_state = TASK_BLOCK_STATE;
+void suspenTask(void (*task)(void)){
+	for (int i = 1; i < numberTask + 1; i++){
+		if (user_task[i].task_handler == task){
+			user_task[i].curent_state = TASK_BLOCK_STATE;
+			break;
+		}
+	}
 }
 
-void resumeTask(void){
-	user_task[curent_task].curent_state = TASK_RUNNING_STATE;
+void resumeTask(void (*task)(void)){
+	for (int i = 1; i < numberTask + 1; i++){
+		if (user_task[i].task_handler == task){
+			user_task[i].curent_state = TASK_RUNNING_STATE;
+			break;
+		}
+	}
 }
 
 void HardFault_Handler(void){
@@ -152,7 +164,9 @@ __attribute__((naked)) void PendSV_Handler(void){
 }
 
 void SysTick_Handler(){
-	g_tick_count++;
+	for (int i = 1; i < numberTask + 1; i++){
+		gTime[i].g_tick_count++;
+	}
 	unblock_task();
 	SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }

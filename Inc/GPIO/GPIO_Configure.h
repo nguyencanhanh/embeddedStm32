@@ -55,7 +55,6 @@
         GPIOC->ODR ^= (1U << (pin)); \
     } while(0)
 
-
 void GPIO_configureRCC(char* GPIOx);
 void GPIO_configure(GPIO_TypeDef* GPIOx, uint8_t* Pin, uint8_t* mode);
 uint8_t ReadPin(GPIO_TypeDef* GPIOx, uint16_t Pin);

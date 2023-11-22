@@ -21,8 +21,8 @@ void task4_handler(void);
 void idleTask(void);
 
 
-uint8_t GPIOB_Pin[] = {11,12};
-uint8_t GPIOB_mode[] = {1,1};
+uint8_t GPIOB_Pin[] = {10,11,12};
+uint8_t GPIOB_mode[] = {1,1,1};
 
 
 int main(void)
@@ -55,19 +55,24 @@ void task1_handler(void){
 }
 void task2_handler(void){
 	while(1){
+		GPIOB_TOGGLE(10);
+		task_delay(4000);
 		printf("oke");
 	}
 }
 void task3_handler(void){
 	while(1){
-		task_delay(1000);
+		GPIOB_OFF(11);
+		task_delay(4000);
+		GPIOB_ON(11);
+		task_delay(10);
 		printf("oke");
 	}
 }
 void task4_handler(void){
 	while(1){
 		GPIOB_TOGGLE(12);
-		task_delay(1000);
+		task_delay(500);
 		printf("oke");
 	}
 }
