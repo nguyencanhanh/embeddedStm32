@@ -2,9 +2,14 @@
 #ifndef RTOS_RTOS_H_
 #define RTOS_RTOS_H_
 
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <stm32f1xx.h>
 
+#define QUEUE_SIZE 				  10
 
 #define DUMMY_XPSR                0x01000000
 
@@ -14,6 +19,9 @@
 #define OUT_DELAY     			  0
 #define IN_DELAY	       		  1
 
+#define SUSPEN_TASK     		  0
+#define RESUME_TASK          	  1
+
 #define SIZE_TASK_STACK           512
 #define SIZE_SCHED_STACK          512
 
@@ -21,19 +29,14 @@
 #define SIZE_SRAM                 (20 * 1024)
 #define SRAM_END                  (SRAM_START + SIZE_SRAM)
 
-#define IDLE_STACK_START          (SRAM_END - (7 * SIZE_TASK_STACK))
-#define SCHED_STACK_START         (SRAM_END - (8 * SIZE_TASK_STACK))
-
 #define TICK_HZ                   1000U
 #define HSI_CLOCK                 8000000U
-#define SYSTICK_TIM_CLK           9 * HSI_CLOCK
+#define SYSTICK_TIM_CLK           HSI_CLOCK
 
 #define MAX_TASK                  8
 
 #define DISABLE_IRQ()             do{__asm volatile("MOV R0, #0x1"); __asm volatile("MSR PRIMASK,R0");} while(0)
 #define ENABLE_IRQ()              do{__asm volatile("MOV R0, #0x0"); __asm volatile("MSR PRIMASK,R0");} while(0)
-
-#define RTOS_INIT(idleTask)       do { enable_rpocessor_faults(); init_scheduler_stack(SCHED_STACK_START); init_task_stack(idleTask); init_systick_timer(TICK_HZ); swich_sp_to_psp();} while(0)
 
 typedef struct{
 	uint32_t psp_value;
@@ -45,24 +48,45 @@ typedef struct{
 typedef struct{
 	uint32_t g_tick_count;
 	uint8_t stateDelay;
+	uint8_t suspenTask;
 }GTIME;
 
+typedef struct {
+    void *data;
+    uint8_t dataSize;
+} QueueItem;
+
+typedef struct {
+    QueueItem items[QUEUE_SIZE];
+    uint8_t front;
+    uint8_t rear;
+    uint8_t count;
+    uint8_t size;
+} Queue;
 
 extern uint8_t curent_task;
+extern uint8_t numberTask;
+extern uint8_t maxTask;
+extern uint8_t queue[];
 extern GTIME gTime[MAX_TASK];
 extern TCB_t user_task[MAX_TASK];
 
-void rtosInit(void (*idleTask)(void));
-
 void createTask(void (*myTask)(void));
 
-void idle_task(void);
-
+/*Init rtos*/
+void rtosInit(void (*idleTask)(void));
 void init_systick_timer(uint32_t tick_hz);
-
 __attribute__((naked)) void init_scheduler_stack(uint32_t sched_top_of_stack);
-
 void init_task_stack(void (*idleTask)(void));
+/*End init rtos*/
+
+/*Queue API*/
+Queue* vQueueCreate(uint8_t size);
+void vQueueDelete(Queue *queue);
+void vQueueSend(Queue *queue, void *data, uint8_t dataSize);
+void vQueueSendToFront(Queue *queue, void *data, uint8_t dataSize);
+void vQueueReceive(Queue *queue, void *outputData);
+/*End queue API*/
 
 __attribute__((naked)) void swich_sp_to_psp(void);
 

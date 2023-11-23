@@ -9,6 +9,9 @@
 #define GPIO_GPIO_CONFIGURE_H_
 
 #include "stm32f1xx.h"
+#include <stdarg.h>
+
+#define BeginGPIO(...) GPIO_Init_Pin_Mode(__VA_ARGS__, 255)
 
 #define GPIOA_ON(pin)  \
     do { \
@@ -55,8 +58,10 @@
         GPIOC->ODR ^= (1U << (pin)); \
     } while(0)
 
+
+void GPIO_Init_Pin_Mode(GPIO_TypeDef* GPIOx, ...);
 void GPIO_configureRCC(char* GPIOx);
-void GPIO_configure(GPIO_TypeDef* GPIOx, uint8_t* Pin, uint8_t* mode);
+void GPIO_configure(GPIO_TypeDef* GPIOx, uint8_t Pin, uint8_t mode);
 uint8_t ReadPin(GPIO_TypeDef* GPIOx, uint16_t Pin);
 
 #endif /* GPIO_GPIO_CONFIGURE_H_ */

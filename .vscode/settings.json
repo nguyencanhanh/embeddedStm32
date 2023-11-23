@@ -1,0 +1,11 @@
+{
+  "files.associations": {
+    "stdlib.h": "c",
+    "stm32f1xx.h": "c",
+    "liquidcrystal_i2c.h": "c",
+    "i2c_configure.h": "c",
+    "gpio_configure.h": "c",
+    "stdint.h": "c",
+    "stm32f103.h": "c"
+  }
+}

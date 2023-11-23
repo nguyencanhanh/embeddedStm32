@@ -1,3 +1,4 @@
 GPIO_Configure.c:9:6:GPIO_configureRCC	5
-GPIO_Configure.c:17:6:GPIO_configure	3
-GPIO_Configure.c:30:9:ReadPin	2
+GPIO_Configure.c:17:6:GPIO_configure	2
+GPIO_Configure.c:26:9:ReadPin	2
+GPIO_Configure.c:35:6:GPIO_Init_Pin_Mode	2
