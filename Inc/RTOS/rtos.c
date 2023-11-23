@@ -5,66 +5,11 @@ uint8_t maxTask;
 uint8_t curent_task = 1;
 TCB_t user_task[MAX_TASK];
 GTIME gTime[MAX_TASK];
-
 // QUEUE
 
-Queue* vQueueCreate(uint8_t size) {
-    Queue *queue = (Queue*)malloc(sizeof(Queue));
-
-    if (queue != NULL) {
-        queue->front = 0;
-        queue->rear = 0;
-        queue->count = 0;
-        queue->size = size;
-    }
-    return queue;
-}
-
-void vQueueDelete(Queue *queue) {
-    if (queue != NULL) {
-        free(queue);
-    }
-}
-
-void vQueueSendToFront(Queue *queue, void *data, uint8_t dataSize) {
-    if (queue->count < queue->size) {
-        QueueItem item;
-        item.data = malloc(dataSize);
-        memcpy(item.data, data, dataSize);
-        item.dataSize = dataSize;
-
-        queue->front = (queue->front - 1 + queue->size) % queue->size;
-        queue->items[queue->front] = item;
-        queue->count++;
-    }
-}
-
-void vQueueSend(Queue *queue, void *data, uint8_t dataSize) {
-	if (queue->count < queue->size) {
-		QueueItem item;
-		item.data = malloc(dataSize);
-		memcpy(item.data, data, dataSize);
-		item.dataSize = dataSize;
-		queue->items[queue->rear] = item;
-		queue->rear = (queue->rear + 1) % queue->size;
-		queue->count++;
-	}
-}
-
-void vQueueReceive(Queue *queue, void *outputData) {
-    if (queue->count > 0) {
-        QueueItem item = queue->items[queue->front];
-        memcpy(outputData, item.data, item.dataSize);
-
-        free(item.data);
-
-        queue->front = (queue->front + 1) % queue->size;
-        queue->count--;
-    }
-}
-
-void createTask(void (*myTask)(void)){
+void createTask(void (*myTask)(void), uint8_t Priority){
   user_task[numberTask+1].task_handler = myTask;
+  user_task[numberTask+1].priority = Priority;
   numberTask++;
   maxTask = numberTask+1;
 }
@@ -79,9 +24,26 @@ __attribute__((naked)) void init_scheduler_stack(uint32_t sched_top_of_stack){
 	__asm volatile ("BX LR");
 }
 
+void swap(TCB_t *a, TCB_t *b) {
+    TCB_t temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void sortTasks(TCB_t user_task[], uint8_t size) {
+    for (int i = 1; i < size; i++) {
+        for (int j = 1; j < size - i + 1; j++) {
+            if (user_task[j - 1].priority > user_task[j].priority) {
+                swap(&user_task[j - 1], &user_task[j]);
+            }
+        }
+    }
+}
+
 void init_task_stack(void(*idleTask)(void)){
 	user_task[0].psp_value = (SRAM_END - (numberTask * SIZE_TASK_STACK));
 	user_task[0].task_handler = idleTask;
+	sortTasks(user_task +1, numberTask);
 
 	uint32_t *pPSP;
 	for(int i = 0; i < maxTask; i++){
@@ -195,7 +157,69 @@ void resumeTask(void (*task)(void)){
 		}
 	}
 }
-//
+
+Queue *QueueCreate(uint8_t size)
+{
+	Queue *queue = (Queue *)malloc(sizeof(Queue));
+
+	if (queue != NULL)
+	{
+		queue->front = 0;
+		queue->rear = 0;
+		queue->count = 0;
+		queue->size = size;
+	}
+	return queue;
+}
+
+void QueueDelete(Queue *queue)
+{
+	if (queue != NULL)
+		free(queue);
+}
+
+void QueueSendToFront(Queue *queue, void *data, uint8_t dataSize)
+{
+	if (queue->count < queue->size)
+	{
+		QueueItem item;
+		item.data = malloc(dataSize);
+		memcpy(item.data, data, dataSize);
+		item.dataSize = dataSize;
+
+		queue->front = (queue->front - 1 + queue->size) % queue->size;
+		queue->items[queue->front] = item;
+		queue->count++;
+	}
+}
+
+void QueueSend(Queue *queue, void *data, uint8_t dataSize)
+{
+	if (queue->count < queue->size) {
+		QueueItem item;
+		item.data = malloc(dataSize);
+		memcpy(item.data, data, dataSize);
+		item.dataSize = dataSize;
+		queue->items[queue->rear] = item;
+		queue->rear = (queue->rear + 1) % queue->size;
+		queue->count++;
+	}
+}
+
+void QueueReceive(Queue *queue, void *outputData)
+{
+	if (queue->count > 0)
+	{
+		QueueItem item = queue->items[queue->front];
+		memcpy(outputData, item.data, item.dataSize);
+
+		free(item.data);
+
+		queue->front = (queue->front + 1) % queue->size;
+		queue->count--;
+	}
+}
+
 void HardFault_Handler(void){
 	printf("HardFault_Handler\n");
 	while(1);

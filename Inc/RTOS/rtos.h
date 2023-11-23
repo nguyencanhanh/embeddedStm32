@@ -42,6 +42,7 @@ typedef struct{
 	uint32_t psp_value;
 	uint32_t block_count;
 	uint8_t curent_state;
+	uint8_t priority;
 	void(*task_handler)(void);
 }TCB_t;
 
@@ -71,7 +72,7 @@ extern uint8_t queue[];
 extern GTIME gTime[MAX_TASK];
 extern TCB_t user_task[MAX_TASK];
 
-void createTask(void (*myTask)(void));
+void createTask(void (*myTask)(void), uint8_t Priority);
 
 /*Init rtos*/
 void rtosInit(void (*idleTask)(void));
@@ -81,11 +82,11 @@ void init_task_stack(void (*idleTask)(void));
 /*End init rtos*/
 
 /*Queue API*/
-Queue* vQueueCreate(uint8_t size);
-void vQueueDelete(Queue *queue);
-void vQueueSend(Queue *queue, void *data, uint8_t dataSize);
-void vQueueSendToFront(Queue *queue, void *data, uint8_t dataSize);
-void vQueueReceive(Queue *queue, void *outputData);
+Queue* QueueCreate(uint8_t size);
+void QueueDelete(Queue *queue);
+void QueueSend(Queue *queue, void *data, uint8_t dataSize);
+void QueueSendToFront(Queue *queue, void *data, uint8_t dataSize);
+void QueueReceive(Queue *queue, void *outputData);
 /*End queue API*/
 
 __attribute__((naked)) void swich_sp_to_psp(void);

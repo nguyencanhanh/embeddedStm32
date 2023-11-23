@@ -30,8 +30,9 @@ typedef struct {
 } MyData;
 
 uint8_t count = 1;
-MyData receivedData;
+MyData receivedData, sent;
 uint8_t recive;
+int togl;
 
 
 int main(void)
@@ -39,11 +40,11 @@ int main(void)
 	GPIO_configureRCC("B");
 	BeginGPIO((GPIO_TypeDef*)GPIOB, 12, 1, 11, 1);
 
-	createTask(task1_handler);
-	createTask(task2_handler);
-	createTask(task3_handler);
-	createTask(task4_handler);
-	createTask(task5_handler);
+	createTask(task1_handler, 2);
+	createTask(task2_handler, 4);
+	createTask(task3_handler, 1);
+	createTask(task4_handler, 5);
+	createTask(task5_handler, 3);
 
 	rtosInit(idle_task);
 	 while (1)
@@ -57,14 +58,14 @@ void idle_task(void){
 
 void task1_handler(void){
 	while(1){
-		GPIOB_TOGGLE(12);
+		togl++;
 		task_delay(1000);
 		printf("oke");
 	}
 }
 
 void task2_handler(void){
-	myQueue = vQueueCreate(5);
+	myQueue = QueueCreate(5);
 	MyData myData;
 	myData.intValue = 0;
 	while(1){
@@ -74,8 +75,9 @@ void task2_handler(void){
 			resumeTask(task1_handler);
 		count++;
 		myData.intValue+=2;
-		vQueueSend(myQueue, &count, sizeof(uint8_t));
-		vQueueSend(myQueue, &myData, sizeof(MyData));
+		sent = myData;
+		QueueSend(myQueue, &count, sizeof(uint8_t));
+		QueueSend(myQueue, &myData, sizeof(MyData));
 		task_delay(1000);
 	}
 }
@@ -98,9 +100,8 @@ void task4_handler(void){
 
 void task5_handler(void){
 	while(1){
-		vQueueReceive(myQueue, &recive);
-		vQueueReceive(myQueue, &receivedData);
-		task_delay(1000);
+		QueueReceive(myQueue, &recive);
+		QueueReceive(myQueue, &receivedData);
 	}
 }
 
