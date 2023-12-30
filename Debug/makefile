@@ -11,15 +11,7 @@ RM := rm -rf
 -include sources.mk
 -include Startup/subdir.mk
 -include Src/subdir.mk
--include Inc/UART/subdir.mk
--include Inc/TIM/subdir.mk
--include Inc/RTOS/subdir.mk
--include Inc/RCC/subdir.mk
--include Inc/LCD/subdir.mk
--include Inc/I2C/subdir.mk
--include Inc/GPIO/subdir.mk
--include Inc/DMA/subdir.mk
--include Inc/ADC/subdir.mk
+-include Inc/Src/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -60,6 +52,9 @@ default.size.stdout \
 OBJDUMP_LIST += \
 embeddedStm32.list \
 
+OBJCOPY_HEX += \
+embeddedStm32.hex \
+
 
 # All Target
 all: main-build
@@ -83,12 +78,17 @@ embeddedStm32.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
+embeddedStm32.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "embeddedStm32.hex"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) default.size.stdout embeddedStm32.elf embeddedStm32.list embeddedStm32.map
+	-$(RM) default.size.stdout embeddedStm32.elf embeddedStm32.hex embeddedStm32.list embeddedStm32.map
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'

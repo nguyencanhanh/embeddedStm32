@@ -1,0 +1,5 @@
+../Drivers/CMSIS/core_cm3.h:1511:22:__NVIC_EnableIRQ	16	static
+../Drivers/CMSIS/core_cm3.h:1639:22:__NVIC_SetPriority	16	static
+../Inc/Src/UART_Configure.c:11:6:UART_Configure	8	static
+../Inc/Src/UART_Configure.c:26:6:UART_SendData	16	static
+../Inc/Src/UART_Configure.c:35:6:UART_ReciveData	24	static

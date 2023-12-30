@@ -1,0 +1,5 @@
+queue.c:9:6:initDynamicQueue	1
+queue.c:20:5:isFullDynamic	1
+queue.c:24:5:isEmptyDynamic	3
+queue.c:28:6:enqueueDynamic	2
+queue.c:36:7:dequeueDynamic	1

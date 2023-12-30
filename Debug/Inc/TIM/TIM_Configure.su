@@ -1,8 +1,0 @@
-../Drivers/CMSIS/core_cm3.h:1511:22:__NVIC_EnableIRQ	16	static
-../Inc/TIM/TIM_Configure.c:13:6:TIM2_Configure	16	static
-../Inc/TIM/TIM_Configure.c:20:6:TIM1_Configure	16	static
-../Inc/TIM/TIM_Configure.c:27:6:TIM4_Configure	16	static
-../Inc/TIM/TIM_Configure.c:37:6:delay_us2	16	static
-../Inc/TIM/TIM_Configure.c:41:6:delay_us1	16	static
-../Inc/TIM/TIM_Configure.c:45:6:delay_ms2	16	static
-../Inc/TIM/TIM_Configure.c:50:6:delay_ms1	16	static

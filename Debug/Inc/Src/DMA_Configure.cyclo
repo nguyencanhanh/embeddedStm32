@@ -1,0 +1,3 @@
+DMA_Configure.c:4:6:DMA_ConfigureADC	1
+DMA_Configure.c:14:6:DMA_ReciveUART	1
+DMA_Configure.c:24:6:sendUART1DMA	2

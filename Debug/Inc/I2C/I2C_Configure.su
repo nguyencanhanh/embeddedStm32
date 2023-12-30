@@ -1,3 +1,0 @@
-../Inc/I2C/I2C_Configure.c:3:6:I2C_GPIO_Config	4	static
-../Inc/I2C/I2C_Configure.c:8:6:I2C1_Configure	4	static
-../Inc/I2C/I2C_Configure.c:18:6:I2C_WriteData	32	static

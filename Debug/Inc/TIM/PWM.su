@@ -1,2 +1,0 @@
-../Inc/TIM/PWM.c:9:6:TIMx_PWM_Init	24	static
-../Inc/TIM/PWM.c:26:6:TIMx_PWM_setDuty	16	static

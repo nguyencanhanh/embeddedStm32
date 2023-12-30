@@ -1,0 +1,5 @@
+../Inc/Src/GPIO_Configure.c:9:6:GPIO_configureRCC	16	static
+../Inc/Src/GPIO_Configure.c:17:6:GPIO_configure	16	static
+../Inc/Src/GPIO_Configure.c:27:6:WritePin	16	static
+../Inc/Src/GPIO_Configure.c:36:9:ReadPin	16	static
+../Inc/Src/GPIO_Configure.c:45:6:GPIO_Init_Pin_Mode	16	static

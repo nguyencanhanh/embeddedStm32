@@ -1,0 +1,17 @@
+LiquidCrystal_I2C.c:12:13:lcd_send_cmd	1
+LiquidCrystal_I2C.c:26:13:lcd_send_data	1
+LiquidCrystal_I2C.c:39:6:lcd_putchar	1
+LiquidCrystal_I2C.c:44:6:lcd_clear_display	1
+LiquidCrystal_I2C.c:49:6:lcd_display_off	1
+LiquidCrystal_I2C.c:54:6:lcd_display_on	1
+LiquidCrystal_I2C.c:60:6:lcd_backlight_on	1
+LiquidCrystal_I2C.c:67:6:lcd_backlight_off	1
+LiquidCrystal_I2C.c:74:6:lcd_set_cursor	1
+LiquidCrystal_I2C.c:80:6:lcd_set_cursor_on	1
+LiquidCrystal_I2C.c:85:6:lcd_set_cursor_off	1
+LiquidCrystal_I2C.c:92:6:lcd_set_cursor_blink_on	1
+LiquidCrystal_I2C.c:98:6:lcd_set_cursor_blink_off	1
+LiquidCrystal_I2C.c:103:6:lcd_create_char	2
+LiquidCrystal_I2C.c:111:6:lcd_write	1
+LiquidCrystal_I2C.c:115:6:lcd_printf	3
+LiquidCrystal_I2C.c:129:6:lcd_init	1

@@ -1,0 +1,5 @@
+../Inc/Src/queue.c:9:6:initDynamicQueue	16	static
+../Inc/Src/queue.c:20:5:isFullDynamic	16	static
+../Inc/Src/queue.c:24:5:isEmptyDynamic	16	static
+../Inc/Src/queue.c:28:6:enqueueDynamic	24	static
+../Inc/Src/queue.c:36:7:dequeueDynamic	24	static
